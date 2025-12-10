@@ -1,0 +1,144 @@
+{
+  "curso_nombre": "JavaScript Fundamentals",
+  "curso_descripcion": "Un curso completo sobre los fundamentos de JavaScript, desde variables hasta funciones avanzadas.",
+  "curso_codigo": "JS101",
+  "modulos": [
+    {
+      "id": "mod1",
+      "nombre": "Fundamentos Básicos",
+      "subtemas": [
+        {
+          "id": "sub1_1",
+          "nombre": "Variables y Tipos de Datos",
+          "contenido": "Las variables en JavaScript son contenedores para almacenar valores de datos.\n\n## Tipos de Variables:\n- var (evitar en código moderno)\n- let (recomendado - scope de bloque)\n- const (recomendado - no se puede reasignar)\n\n## Tipos de Datos Primitivos:\n1. string - Texto entre comillas: \"Hola\", 'Mundo'\n2. number - Números: 42, 3.14, -10\n3. boolean - Verdadero/Falso: true, false\n4. null - Representa ausencia intencional de valor\n5. undefined - Variable declarada pero no asignada\n6. symbol - Valor único e inmutable\n\n## Typeof Operator:\ntypeof \"Hola\" // \"string\"\ntypeof 42 // \"number\"\ntypeof true // \"boolean\"\ntypeof undefined // \"undefined\"\ntypeof null // \"object\" (quirk histórico)\n\n## Ejemplos:\nconst nombre = \"Juan\"; // string\nconst edad = 25; // number\nconst esEstudiante = true; // boolean\nlet ciudad; // undefined",
+          "actividades": [
+            {
+              "type": "question",
+              "text": "¿Cuál es la diferencia entre let y var?",
+              "answer": "let tiene scope de bloque, var tiene scope de función"
+            },
+            {
+              "type": "code",
+              "text": "Escribe una variable const que almacene tu nombre"
+            },
+            {
+              "type": "question",
+              "text": "¿Qué devuelve typeof null?",
+              "answer": "object (es un quirk histórico de JavaScript)"
+            }
+          ]
+        },
+        {
+          "id": "sub1_2",
+          "nombre": "Operadores y Expresiones",
+          "contenido": "Los operadores permiten realizar operaciones sobre variables y valores.\n\n## Operadores Aritméticos:\n+ Suma: 5 + 3 = 8\n- Resta: 10 - 4 = 6\n* Multiplicación: 3 * 4 = 12\n/ División: 20 / 4 = 5\n% Módulo (residuo): 10 % 3 = 1\n** Exponenciación: 2 ** 3 = 8\n\n## Operadores de Asignación:\n= Asignar: x = 5\n+= Suma y asigna: x += 3 equivale a x = x + 3\n-= Resta y asigna: x -= 2 equivale a x = x - 2\n*= Multiplica y asigna: x *= 2\n/= Divide y asigna: x /= 2\n\n## Operadores de Comparación:\n== Igual (compara valor): 5 == \"5\" es true\n=== Idéntico (compara valor y tipo): 5 === \"5\" es false\n!= No igual: 5 != 6 es true\n!== No idéntico: 5 !== \"5\" es true\n< Menor que: 3 < 5 es true\n> Mayor que: 10 > 5 es true\n<= Menor o igual: 5 <= 5 es true\n>= Mayor o igual: 10 >= 8 es true\n\n## Operadores Lógicos:\n&& AND (Y): (true && false) es false\n|| OR (O): (true || false) es true\n! NOT (NO): !true es false\n\n## Ejemplos:\nlet x = 10;\nlet y = 3;\nconsole.log(x + y); // 13\nconsole.log(x > y && y > 0); // true\nconsole.log(x === \"10\"); // false",
+          "actividades": [
+            {
+              "type": "code",
+              "text": "Suma 5 + 3 y asigna el resultado a una variable"
+            },
+            {
+              "type": "question",
+              "text": "¿Cuál es la diferencia entre == y ===?",
+              "answer": "== compara solo valor, === compara valor y tipo"
+            },
+            {
+              "type": "code",
+              "text": "Usa operadores lógicos: verdadero si x > 5 AND x < 20"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod2",
+      "nombre": "Funciones y Control de Flujo",
+      "subtemas": [
+        {
+          "id": "sub2_1",
+          "nombre": "Funciones",
+          "contenido": "Las funciones son bloques reutilizables de código.\n\n## Declaración de Función:\nfunction saludar(nombre) {\n  return \"Hola, \" + nombre;\n}\n\nsaludar(\"Juan\"); // \"Hola, Juan\"\n\n## Función con Múltiples Parámetros:\nfunction sumar(a, b) {\n  return a + b;\n}\n\nsumar(5, 3); // 8\n\n## Función sin Retorno:\nfunction mostrarMensaje() {\n  console.log(\"Este es un mensaje\");\n}\n\n## Arrow Functions (=>):\nconst multiplicar = (a, b) => a * b;\nmultiplicar(4, 5); // 20\n\nconst saludarArrow = (nombre) => {\n  console.log(\"Hola \" + nombre);\n};\n\nsaludarArrow(\"María\"); // Hola María\n\n## Parámetros por Defecto:\nfunction greet(nombre = \"Amigo\") {\n  return \"¡Hola, \" + nombre + \"!\";\n}\n\ngreet(); // \"¡Hola, Amigo!\"\ngreet(\"Carlos\"); // \"¡Hola, Carlos!\"\n\n## Scope y Closures:\nconst makeCounter = () => {\n  let count = 0;\n  return () => {\n    count++;\n    return count;\n  };\n};\n\nconst counter = makeCounter();\ncounter(); // 1\ncounter(); // 2",
+          "actividades": [
+            {
+              "type": "code",
+              "text": "Escribe una función que multiplique dos números"
+            },
+            {
+              "type": "code",
+              "text": "Convierte la función anterior a Arrow Function"
+            },
+            {
+              "type": "question",
+              "text": "¿Qué es un closure?",
+              "answer": "Una función que tiene acceso a variables de su función padre"
+            }
+          ]
+        },
+        {
+          "id": "sub2_2",
+          "nombre": "Arrays",
+          "contenido": "Los arrays almacenan múltiples valores en una sola variable.\n\n## Crear Arrays:\nconst numeros = [1, 2, 3, 4, 5];\nconst nombres = [\"Juan\", \"María\", \"Carlos\"];\nconst mixto = [1, \"Texto\", true, null];\n\n## Acceder a Elementos:\nconst frutas = [\"Manzana\", \"Plátano\", \"Naranja\"];\nconsole.log(frutas[0]); // \"Manzana\"\nconsole.log(frutas[2]); // \"Naranja\"\n\n## Métodos de Array:\n- push(): Agregar elemento al final\n- pop(): Eliminar último elemento\n- shift(): Eliminar primer elemento\n- unshift(): Agregar elemento al inicio\n- length: Obtener cantidad de elementos\n- slice(): Obtener parte del array\n- splice(): Modificar contenido\n- map(): Transformar cada elemento\n- filter(): Filtrar elementos\n- forEach(): Iterar sobre elementos\n\n## Ejemplos:\nconst numeros = [1, 2, 3];\n\nnumeros.push(4); // [1, 2, 3, 4]\nnumeros.pop(); // [1, 2, 3]\n\nconst dobles = numeros.map(x => x * 2); // [2, 4, 6]\n\nconst pares = numeros.filter(x => x % 2 === 0); // [2]\n\nnumeros.forEach(x => console.log(x)); // Imprime 1, 2, 3\n\nconst suma = numeros.reduce((a, b) => a + b, 0); // 6",
+          "actividades": [
+            {
+              "type": "code",
+              "text": "Crea un array de 5 números y obtén el primero"
+            },
+            {
+              "type": "code",
+              "text": "Usa map() para multiplicar cada número por 2"
+            },
+            {
+              "type": "code",
+              "text": "Usa filter() para obtener solo números mayores a 5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mod3",
+      "nombre": "Objetos y Métodos",
+      "subtemas": [
+        {
+          "id": "sub3_1",
+          "nombre": "Objetos en JavaScript",
+          "contenido": "Los objetos son colecciones de propiedades y métodos.\n\n## Crear Objetos:\nconst persona = {\n  nombre: \"Juan\",\n  edad: 25,\n  ciudad: \"Madrid\"\n};\n\n## Acceder a Propiedades:\nconsole.log(persona.nombre); // \"Juan\"\nconsole.log(persona[\"edad\"]); // 25\n\n## Métodos (Funciones en Objetos):\nconst usuario = {\n  nombre: \"María\",\n  saludar: function() {\n    return \"Hola, soy \" + this.nombre;\n  }\n};\n\nusuario.saludar(); // \"Hola, soy María\"\n\n## Modificar Objetos:\npersona.edad = 26;\npersona.pais = \"España\"; // Agregar nueva propiedad\ndelete persona.ciudad; // Eliminar propiedad\n\n## Object Methods:\nObject.keys(persona); // [\"nombre\", \"edad\", \"pais\"]\nObject.values(persona); // [\"Juan\", 26, \"España\"]\nObject.entries(persona); // [[\"nombre\", \"Juan\"], ...]\n\n## Desestructuración:\nconst {nombre, edad} = persona;\nconsole.log(nombre); // \"Juan\"\nconsole.log(edad); // 26",
+          "actividades": [
+            {
+              "type": "code",
+              "text": "Crea un objeto 'libro' con propiedades: titulo, autor, año"
+            },
+            {
+              "type": "code",
+              "text": "Agrega un método 'resumen' que devuelva información del libro"
+            },
+            {
+              "type": "question",
+              "text": "¿Qué es 'this' en un método?",
+              "answer": "Hace referencia al objeto que contiene el método"
+            }
+          ]
+        },
+        {
+          "id": "sub3_2",
+          "nombre": "Clases y POO",
+          "contenido": "Las clases permiten crear objetos de forma estructurada.\n\n## Sintaxis de Clase:\nclass Animal {\n  constructor(nombre) {\n    this.nombre = nombre;\n  }\n\n  hablar() {\n    return this.nombre + \" hace un sonido\";\n  }\n}\n\nconst perro = new Animal(\"Rex\");\nperro.hablar(); // \"Rex hace un sonido\"\n\n## Propiedades y Métodos:\nclass Coche {\n  constructor(marca, modelo) {\n    this.marca = marca;\n    this.modelo = modelo;\n  }\n\n  descripcion() {\n    return this.marca + \" \" + this.modelo;\n  }\n}\n\n## Herencia:\nclass Pajaro extends Animal {\n  constructor(nombre, vuela) {\n    super(nombre);\n    this.vuela = vuela;\n  }\n\n  volar() {\n    if (this.vuela) {\n      return this.nombre + \" está volando\";\n    }\n  }\n}\n\nconst pajaro = new Pajaro(\"Tweety\", true);\npajaro.volar(); // \"Tweety está volando\"\n\n## Métodos Estáticos:\nclass Utilidad {\n  static sumar(a, b) {\n    return a + b;\n  }\n}\n\nUtilidad.sumar(5, 3); // 8",
+          "actividades": [
+            {
+              "type": "code",
+              "text": "Crea una clase 'Estudiante' con nombre, matricula y calificacion"
+            },
+            {
+              "type": "code",
+              "text": "Agrega un método 'aprobado' que devuelva true si calificacion >= 6"
+            },
+            {
+              "type": "code",
+              "text": "Crea una clase 'EstudianteAvanzado' que extienda 'Estudiante'"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
