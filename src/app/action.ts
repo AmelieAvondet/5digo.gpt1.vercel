@@ -19,7 +19,7 @@ export async function registerUser(formData: FormData) {
     console.log(`[AUTH] Registrando nuevo usuario: ${email}, role: ${role}`);
     const supabase = await createServerSupabaseClient();
 
-    // 1. Crear usuario con Supabase Auth con confirmación de email habilitada
+    // 1. Crear usuario con Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -27,7 +27,6 @@ export async function registerUser(formData: FormData) {
         data: {
           role: role, // Metadata del usuario
         },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
       },
     });
 
@@ -54,15 +53,9 @@ export async function registerUser(formData: FormData) {
     }
 
     console.log(`[AUTH] Usuario registrado con ID: ${authData.user.id}`);
-    console.log(`[AUTH] Email de confirmación enviado a: ${email}`);
 
-    // No iniciar sesión automáticamente, esperar confirmación de email
-    return {
-      success: true,
-      userId: authData.user.id,
-      role,
-      emailConfirmationRequired: true
-    };
+    // Supabase Auth maneja automáticamente la sesión con cookies
+    return { success: true, userId: authData.user.id, role };
 
   } catch (e: any) {
     console.error(`[AUTH] Error en registro:`, e.message);
@@ -97,14 +90,7 @@ export async function loginUser(formData: FormData) {
       return { error: "Error al iniciar sesión." };
     }
 
-    // 2. Verificar si el email está confirmado
-    if (!authData.user.email_confirmed_at) {
-      console.log(`[AUTH] Email no verificado para: ${email}`);
-      await supabase.auth.signOut(); // Cerrar sesión si no está verificado
-      return { error: "Por favor, verifica tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada." };
-    }
-
-    // 3. Obtener el rol del usuario desde profiles
+    // 2. Obtener el rol del usuario desde profiles
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
@@ -158,31 +144,5 @@ export async function getCurrentUser() {
   } catch (e: any) {
     console.error(`[AUTH] Error al verificar usuario:`, e.message);
     return { user: null };
-  }
-}
-
-export async function resendVerificationEmail(email: string) {
-  try {
-    console.log(`[AUTH] Reenviando email de verificación a: ${email}`);
-    const supabase = await createServerSupabaseClient();
-
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: email,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      console.error(`[AUTH] Error al reenviar email:`, error.message);
-      return { error: error.message };
-    }
-
-    console.log(`[AUTH] Email de verificación reenviado a: ${email}`);
-    return { success: true };
-  } catch (e: any) {
-    console.error(`[AUTH] Error al reenviar email:`, e.message);
-    return { error: e.message || "Error al reenviar email de verificación." };
   }
 }
