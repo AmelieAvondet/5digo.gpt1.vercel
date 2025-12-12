@@ -1,7 +1,7 @@
 // Archivo: lib/auth.ts
 // Utilidades centralizadas de autenticación con Supabase
 
-import { createServerSupabaseClient } from './supabase';
+import { createServerSupabaseClient } from './supabase.server';
 
 /**
  * Interfaz del usuario autenticado
