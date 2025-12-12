@@ -1,7 +1,7 @@
 // Archivo: lib/supabase.ts
-// Cliente Supabase para uso en cliente (browser) y servidor
 
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -12,7 +12,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Cliente para operaciones admin (server-side only)
-// NOTA: Este cliente debe usarse SOLO en el servidor, nunca en componentes cliente
 export const supabaseAdmin = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseServiceKey || 'placeholder_key',
@@ -29,5 +28,36 @@ export function createSupabaseClient() {
   return createClient(
     supabaseUrl || 'https://placeholder.supabase.co',
     supabaseAnonKey || 'placeholder_key'
+  );
+}
+
+// Cliente server-side con manejo de cookies
+export async function createServerSupabaseClient() {
+  const cookieStore = await cookies();
+
+  return createClient(
+    supabaseUrl || 'https://placeholder.supabase.co',
+    supabaseAnonKey || 'placeholder_key',
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name: string, value: string, options: any) {
+          try {
+            cookieStore.set({ name, value, ...options });
+          } catch (error) {
+            // Cookie setting might fail in some contexts (middleware)
+          }
+        },
+        remove(name: string, options: any) {
+          try {
+            cookieStore.set({ name, value: '', ...options });
+          } catch (error) {
+            // Cookie removal might fail in some contexts
+          }
+        },
+      },
+    }
   );
 }

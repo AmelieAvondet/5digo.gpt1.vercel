@@ -2,8 +2,7 @@
 
 "use server";
 
-import { createServerSupabaseClient } from '@/lib/supabase.server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { createServerSupabaseClient, supabaseAdmin } from '@/lib/supabase';
 import { getAuthUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
