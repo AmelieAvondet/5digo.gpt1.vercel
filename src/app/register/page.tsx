@@ -18,6 +18,7 @@ export default function RegisterPage() {
     const [role, setRole] = useState<'alumno' | 'profesor'>('alumno');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [registrationSuccess, setRegistrationSuccess] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -50,17 +51,76 @@ export default function RegisterPage() {
                 return;
             }
 
-            // Registro exitoso - redirigir según rol
-            if (role === 'profesor') {
-                router.push('/admin/courses');
+            // Registro exitoso - mostrar mensaje de verificación
+            if (result.emailConfirmationRequired) {
+                setRegistrationSuccess(true);
+                setLoading(false);
             } else {
-                router.push('/courses');
+                // Si no requiere confirmación (modo legacy), redirigir según rol
+                if (role === 'profesor') {
+                    router.push('/admin/courses');
+                } else {
+                    router.push('/courses');
+                }
             }
         } catch (err: any) {
             setError('Error al conectarse al servidor');
             setLoading(false);
         }
     };
+
+    // Si el registro fue exitoso, mostrar mensaje de confirmación
+    if (registrationSuccess) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-emerald-900 to-slate-900 p-4">
+                <div className="w-full max-w-md">
+                    <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur">
+                        <CardHeader className="space-y-2 pb-4">
+                            <div className="flex items-center justify-center mb-2">
+                                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                                    <Mail className="w-8 h-8 text-emerald-600" />
+                                </div>
+                            </div>
+                            <CardTitle className="text-2xl text-center">¡Revisa tu correo!</CardTitle>
+                            <CardDescription className="text-center">Te hemos enviado un email de verificación</CardDescription>
+                        </CardHeader>
+
+                        <CardContent className="space-y-4">
+                            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                                <p className="text-emerald-800 text-sm text-center mb-2">
+                                    Hemos enviado un enlace de verificación a:
+                                </p>
+                                <p className="text-emerald-900 font-semibold text-center">
+                                    {email}
+                                </p>
+                            </div>
+
+                            <div className="space-y-2 text-sm text-gray-600">
+                                <p>Por favor, sigue estos pasos:</p>
+                                <ol className="list-decimal list-inside space-y-1 ml-2">
+                                    <li>Abre tu correo electrónico</li>
+                                    <li>Busca el email de verificación</li>
+                                    <li>Haz clic en el enlace de confirmación</li>
+                                    <li>Vuelve aquí para iniciar sesión</li>
+                                </ol>
+                            </div>
+
+                            <div className="pt-4 border-t">
+                                <p className="text-xs text-gray-500 text-center mb-3">
+                                    ¿No recibiste el email? Revisa tu carpeta de spam.
+                                </p>
+                                <Link href="/login">
+                                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+                                        Ir a iniciar sesión
+                                    </Button>
+                                </Link>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-emerald-900 to-slate-900 p-4">
