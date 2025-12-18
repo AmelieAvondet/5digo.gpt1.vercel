@@ -1,7 +1,6 @@
 // Archivo: lib/auth.ts
 // Utilidades de autenticación con Supabase Auth
 
-import { cookies } from 'next/headers';
 import { createServerClient } from './supabase';
 
 /**
@@ -71,17 +70,4 @@ export async function clearAuthSession(): Promise<void> {
   } catch (error) {
     console.error('[AUTH] Error clearing session:', error);
   }
-}
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7, // 7 días
-    path: '/',
-  });
-}
-
-/**
- * Elimina el token de autenticación de las cookies
- */
-export async function clearAuthCookie(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete('auth_token');
 }
