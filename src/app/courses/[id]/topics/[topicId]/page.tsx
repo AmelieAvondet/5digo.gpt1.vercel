@@ -26,10 +26,10 @@ interface ChatMessage {
 function formatMessageContent(content: string): string {
   const escapeHtml = (text: string) =>
     text.replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
 
   // Detectar y extraer bloques de código ANTES de escapar HTML
   const codeBlocks: { placeholder: string; html: string }[] = [];
@@ -211,8 +211,21 @@ export default function TopicChatPage() {
 
   if (!topic) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-red-600">Error al cargar el temario</p>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center flex-col p-4">
+        <p className="text-red-600 font-bold text-lg mb-2">Error al cargar el temario</p>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded p-3 mb-4 max-w-md text-red-800">
+            {error}
+          </div>
+        )}
+        <div className="flex gap-4">
+          <Link
+            href={`/courses/${courseId}`}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            Volver al curso
+          </Link>
+        </div>
       </div>
     );
   }
@@ -230,9 +243,8 @@ export default function TopicChatPage() {
         <div className="w-full flex flex-col bg-white rounded-lg shadow-md overflow-hidden">
           {/* Status Bar */}
           {completionStatus !== 'in_progress' && (
-            <div className={`px-6 py-3 text-sm font-medium text-white ${
-              completionStatus === 'completed' ? 'bg-green-600' : 'bg-blue-600'
-            }`}>
+            <div className={`px-6 py-3 text-sm font-medium text-white ${completionStatus === 'completed' ? 'bg-green-600' : 'bg-blue-600'
+              }`}>
               {completionStatus === 'completed' && (
                 <p>✅ ¡Temario completado! Puedes pasar al siguiente.</p>
               )}
@@ -260,11 +272,10 @@ export default function TopicChatPage() {
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md xl:max-w-2xl px-4 py-3 rounded-lg ${
-                      msg.role === 'user'
+                    className={`max-w-xs lg:max-w-md xl:max-w-2xl px-4 py-3 rounded-lg ${msg.role === 'user'
                         ? 'bg-blue-600 text-white rounded-br-none'
                         : 'bg-gray-200 text-gray-900 rounded-bl-none'
-                    }`}
+                      }`}
                   >
                     <div
                       className="text-sm whitespace-pre-wrap leading-relaxed"
@@ -274,11 +285,10 @@ export default function TopicChatPage() {
                     />
                     {msg.timestamp && (
                       <p
-                        className={`text-xs mt-1 ${
-                          msg.role === 'user'
+                        className={`text-xs mt-1 ${msg.role === 'user'
                             ? 'text-blue-100'
                             : 'text-gray-500'
-                        }`}
+                          }`}
                       >
                         {new Date(msg.timestamp).toLocaleTimeString('es-ES', {
                           hour: '2-digit',

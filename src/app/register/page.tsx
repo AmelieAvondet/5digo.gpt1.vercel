@@ -84,6 +84,8 @@ export default function RegisterPage() {
                                     <Input
                                         id="email"
                                         type="email"
+                                        name="email"
+                                        autoComplete="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="nombre@ejemplo.com"
@@ -102,6 +104,8 @@ export default function RegisterPage() {
                                     <Input
                                         id="password"
                                         type="password"
+                                        name="password"
+                                        autoComplete="new-password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
@@ -120,6 +124,8 @@ export default function RegisterPage() {
                                     <Input
                                         id="confirmPassword"
                                         type="password"
+                                        name="confirmPassword"
+                                        autoComplete="new-password"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         placeholder="••••••••"
@@ -137,11 +143,10 @@ export default function RegisterPage() {
                                     <button
                                         type="button"
                                         onClick={() => setRole('alumno')}
-                                        className={`w-full p-3 border-2 rounded-lg transition-all ${
-                                            role === 'alumno'
+                                        className={`w-full p-3 border-2 rounded-lg transition-all ${role === 'alumno'
                                                 ? 'border-emerald-600 bg-emerald-50'
                                                 : 'border-gray-200 bg-white hover:border-gray-300'
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex items-center gap-2">
                                             <User className="w-4 h-4" />
@@ -154,11 +159,10 @@ export default function RegisterPage() {
                                     <button
                                         type="button"
                                         onClick={() => setRole('profesor')}
-                                        className={`w-full p-3 border-2 rounded-lg transition-all ${
-                                            role === 'profesor'
+                                        className={`w-full p-3 border-2 rounded-lg transition-all ${role === 'profesor'
                                                 ? 'border-blue-600 bg-blue-50'
                                                 : 'border-gray-200 bg-white hover:border-gray-300'
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex items-center gap-2">
                                             <User className="w-4 h-4" />

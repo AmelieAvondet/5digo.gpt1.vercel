@@ -54,7 +54,7 @@ export async function enrollInCourse(courseCode: string) {
 
     // ===== NUEVO: Inicializar Syllabus automáticamente =====
     console.log(`[STUDENT] Initializing syllabus for student ${studentId} in course ${course.id}`);
-    
+
     // Obtener todos los topics del curso
     const { data: topics, error: topicsError } = await supabaseAdmin
       .from('topics')
@@ -102,6 +102,7 @@ export async function getStudentCourses() {
       return { error: 'No estás autenticado', courses: [] };
     }
 
+    // 1. Obtener enrollments y datos básicos del curso (SIN join a users)
     const { data: enrollments, error: enrollError } = await supabaseAdmin
       .from('course_enrollments')
       .select(`
@@ -113,27 +114,47 @@ export async function getStudentCourses() {
           description,
           code,
           created_at,
-          users (
-            email
-          )
+          teacher_id
         )
       `)
       .eq('student_id', studentId);
 
     if (enrollError) {
+      console.error('Error fetching enrollments:', enrollError);
       return { error: 'Error al cargar cursos', courses: [] };
     }
 
-    const courses = enrollments?.map((e: any) => ({
+    if (!enrollments || enrollments.length === 0) {
+      return { success: true, courses: [] };
+    }
+
+    // 2. Obtener IDs de los profesores
+    const teacherIds = [...new Set(enrollments.map((e: any) => e.courses?.teacher_id).filter(Boolean))];
+
+    // 3. Obtener emails de los profesores
+    let teachersMap = new Map();
+    if (teacherIds.length > 0) {
+      const { data: teachers, error: teachersError } = await supabaseAdmin
+        .from('users')
+        .select('id, email')
+        .in('id', teacherIds);
+
+      if (!teachersError && teachers) {
+        teachers.forEach(t => teachersMap.set(t.id, t.email));
+      }
+    }
+
+    // 4. Mapear resultados
+    const courses = enrollments.map((e: any) => ({
       enrollmentId: e.id,
       id: e.courses.id,
       name: e.courses.name,
       description: e.courses.description,
       code: e.courses.code,
       progress: e.progress,
-      teacher: e.courses.users?.email || 'Desconocido',
+      teacher: teachersMap.get(e.courses.teacher_id) || 'Desconocido',
       created_at: e.courses.created_at,
-    })) || [];
+    }));
 
     return { success: true, courses };
   } catch (error) {
@@ -162,7 +183,7 @@ export async function getStudentCourseDetails(courseId: string) {
       return { error: 'No estás inscrito en este curso' };
     }
 
-    // Obtener detalles del curso
+    // Obtener detalles del curso (SIN join a users)
     const { data: course, error: courseError } = await supabaseAdmin
       .from('courses')
       .select(`
@@ -171,15 +192,25 @@ export async function getStudentCourseDetails(courseId: string) {
         description,
         code,
         created_at,
-        users (
-          email
-        )
+        teacher_id
       `)
       .eq('id', courseId)
       .single();
 
     if (courseError) {
       return { error: 'Error al cargar el curso' };
+    }
+
+    // Obtener email del profesor manualmente
+    let teacherEmail = 'Desconocido';
+    if (course.teacher_id) {
+      const { data: teacher } = await supabaseAdmin
+        .from('users')
+        .select('email')
+        .eq('id', course.teacher_id)
+        .single();
+
+      if (teacher) teacherEmail = teacher.email;
     }
 
     // Obtener temarios
@@ -220,10 +251,6 @@ export async function getStudentCourseDetails(courseId: string) {
       ...topic,
       status: (topicStatusMap.get(topic.id) || 'pending') as 'pending' | 'in_progress' | 'completed',
     })) || [];
-
-    const teacherEmail = Array.isArray((course as any).users)
-      ? (course as any).users[0]?.email || 'Desconocido'
-      : (course as any).users?.email || 'Desconocido';
 
     return {
       success: true,
@@ -337,7 +364,8 @@ export async function getTopicDetails(courseId: string, topicId: string) {
         .single();
 
       if (newSessionError) {
-        return { error: 'Error al crear sesión de chat' };
+        console.error('Error al crear sesión de chat (detalle):', newSessionError);
+        return { error: `Error al crear sesión de chat: ${newSessionError.message}` };
       }
 
       sessionId = newSession.id;

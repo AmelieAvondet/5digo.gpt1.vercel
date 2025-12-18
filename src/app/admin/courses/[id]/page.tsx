@@ -19,9 +19,9 @@ interface Enrollment {
   student_id: string;
   progress: number;
   created_at?: string;
-  users?: {
+  student?: {
     email: string;
-  }[];
+  };
 }
 
 export default function CourseDetailsPage() {
@@ -180,10 +180,10 @@ export default function CourseDetailsPage() {
                   className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
                 >
                   <div className="mb-3">
-                    {enrollment.users && enrollment.users.length > 0 && enrollment.users[0]?.email ? (
+                    {enrollment.student?.email ? (
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-lg">👤</span>
-                        <span className="font-semibold text-gray-900 break-all">{enrollment.users[0].email}</span>
+                        <span className="font-semibold text-gray-900 break-all">{enrollment.student.email}</span>
                       </div>
                     ) : (
                       <span className="font-semibold text-gray-900">ID: {enrollment.student_id.slice(0, 8)}...</span>

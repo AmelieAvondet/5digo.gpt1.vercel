@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
 
   // Permitir rutas públicas
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route));
-  
+
   // Verificar si es una ruta protegida
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 

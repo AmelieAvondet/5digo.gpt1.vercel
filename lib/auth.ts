@@ -2,6 +2,7 @@
 // Utilidades de autenticación con Supabase Auth
 
 import { createServerClient } from './supabase';
+import { cookies } from 'next/headers';
 
 /**
  * Interfaz del usuario autenticado
@@ -17,15 +18,23 @@ export interface AuthUser {
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('sb-access-token')?.value;
+
+    if (!token) {
+      return null;
+    }
+
     const supabase = await createServerClient();
-    
+
+    // Validar token con Supabase
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      console.log('[AUTH] No user session found');
+      // console.log('[AUTH] No user session found');
       return null;
     }
 
@@ -37,7 +46,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       .single();
 
     if (userError || !userData) {
-      console.log('[AUTH] User data not found in database');
+      // console.log('[AUTH] User data not found in database');
       return null;
     }
 
@@ -47,7 +56,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       role: userData.role,
     };
   } catch (error) {
-    console.error('[AUTH] Error getting current user:', error);
+    // console.error('[AUTH] Error getting current user:', error);
     return null;
   }
 }

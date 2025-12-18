@@ -53,7 +53,7 @@ export default function LoginPage() {
       {/* Elementos decorativos */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-slate-400/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-      
+
       <div className="w-full max-w-md relative z-10">
         <Card className="border-0 shadow-2xl bg-white">
           <CardHeader className="space-y-3 pb-6 text-center">
@@ -74,6 +74,8 @@ export default function LoginPage() {
                   <Input
                     id="email"
                     type="email"
+                    name="email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nombre@ejemplo.com"
@@ -92,6 +94,8 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     type="password"
+                    name="password"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"

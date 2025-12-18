@@ -89,21 +89,39 @@ export async function getCourseDetails(courseId: string) {
 
     if (topicsError) throw topicsError;
 
-    // Obtener alumnos inscritos con su información de usuario
-    const { data: enrollments, error: enrollmentsError } = await supabaseAdmin
+    // Obtener alumnos inscritos (sin join para evitar error de relación)
+    const { data: rawEnrollments, error: enrollmentsError } = await supabaseAdmin
       .from('course_enrollments')
-      .select(`
-        id,
-        student_id,
-        progress,
-        created_at,
-        users:student_id (
-          email
-        )
-      `)
+      .select('id, student_id, progress, created_at')
       .eq('course_id', courseId);
 
     if (enrollmentsError) throw enrollmentsError;
+
+    // Obtener información de usuarios manualmente
+    let enrollments = [];
+    if (rawEnrollments && rawEnrollments.length > 0) {
+      const studentIds = rawEnrollments.map(e => e.student_id);
+
+      const { data: users, error: usersError } = await supabaseAdmin
+        .from('users')
+        .select('id, email')
+        .in('id', studentIds);
+
+      if (usersError) {
+        console.error('Error fetching users for enrollments:', usersError);
+        // Si falla usuarios, devolvemos enrollments sin datos de usuario
+        enrollments = rawEnrollments.map(e => ({ ...e, student: null }));
+      } else {
+        // Unir datos en JS
+        enrollments = rawEnrollments.map(enrollment => {
+          const user = users?.find(u => u.id === enrollment.student_id);
+          return {
+            ...enrollment,
+            student: user ? { email: user.email } : null
+          };
+        });
+      }
+    }
 
     return { success: true, course, topics, enrollments };
   } catch (e: any) {
@@ -523,4 +541,3 @@ export async function setPersonaForCourse(
     return { error: 'Error al procesar la solicitud' };
   }
 }
-

@@ -5,6 +5,7 @@
 import { supabaseAdmin, createServerClient } from '@/lib/supabase';
 import { redirect } from 'next/navigation';
 import { getCurrentUser, clearAuthSession } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export async function registerUser(formData: FormData) {
   const email = formData.get("email") as string;
@@ -45,6 +46,7 @@ export async function registerUser(formData: FormData) {
         id: authData.user.id,
         email,
         role,
+        password_hash: 'managed_by_supabase_auth' // Dummy value para cumplir constraint NOT NULL de la BD actual
       }])
       .select()
       .single();
@@ -57,11 +59,25 @@ export async function registerUser(formData: FormData) {
     }
 
     console.log(`[AUTH] Usuario registrado exitosamente: ${email}`);
-    return { 
-      success: true, 
-      userId: authData.user.id, 
+
+    // Guardar sesión en cookies
+    if (authData.session) {
+      const cookieStore = await cookies();
+      cookieStore.set('sb-access-token', authData.session.access_token, {
+        path: '/',
+        httpOnly: true,
+        // IMPORTANTE: secure false para localhost para evitar problemas con http
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // 1 semana
+        sameSite: 'lax',
+      });
+    }
+
+    return {
+      success: true,
+      userId: authData.user.id,
       role,
-      message: "Registro exitoso. Por favor verifica tu email." 
+      message: "Registro exitoso."
     };
 
   } catch (e: any) {
@@ -111,10 +127,24 @@ export async function loginUser(formData: FormData) {
     }
 
     console.log(`[AUTH] Login exitoso para: ${email}`);
-    return { 
-      success: true, 
-      userId: userData.id, 
-      role: userData.role 
+
+    // Guardar sesión en cookies
+    if (authData.session) {
+      const cookieStore = await cookies();
+      cookieStore.set('sb-access-token', authData.session.access_token, {
+        path: '/',
+        httpOnly: true,
+        // IMPORTANTE: secure false para localhost
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // 1 semana
+        sameSite: 'lax',
+      });
+    }
+
+    return {
+      success: true,
+      userId: userData.id,
+      role: userData.role
     };
 
   } catch (e: any) {
@@ -126,6 +156,9 @@ export async function loginUser(formData: FormData) {
 export async function logoutUser() {
   try {
     console.log(`[AUTH] Logout solicitado`);
+    const cookieStore = await cookies();
+    cookieStore.delete('sb-access-token');
+
     const supabase = await createServerClient();
     await supabase.auth.signOut();
     await clearAuthSession();
@@ -133,20 +166,5 @@ export async function logoutUser() {
   } catch (e: any) {
     console.error(`[AUTH] Error en logout:`, e.message);
     return { error: e.message || "Error al cerrar sesión." };
-  }
-}
-
-export async function getCurrentUserAction() {
-  try {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return { user: null };
-    }
-
-    return { user: { id: user.id, email: user.email, role: user.role } };
-  } catch (e: any) {
-    console.error(`[AUTH] Error al verificar usuario:`, e.message);
-    return { user: null };
   }
 }
