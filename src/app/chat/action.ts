@@ -5,7 +5,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabaseAdmin } from '@/lib/supabase';
-import { getUserIdFromToken } from '@/lib/auth';
+import { getUserId } from '@/lib/auth';
 import { TEACHER_PROMPT, fillPrompt } from '@/lib/prompts';
 import {
   extractTextResponse,
@@ -41,7 +41,7 @@ const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
  */
 async function getUserIdFromTokenInternal(): Promise<string | null> {
   try {
-    const userId = await getUserIdFromToken();
+    const userId = await getUserId();
     if (userId) {
       console.log(`[CHAT] UserId extracted from JWT: ${userId}`);
     } else {

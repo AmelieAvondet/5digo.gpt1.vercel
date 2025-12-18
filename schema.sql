@@ -2,50 +2,43 @@
 -- Esquema de base de datos para Educación AI
 
 -- 1. Tabla de usuarios
+-- Nota: Las contraseñas se manejan en Supabase Auth
 CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(50) DEFAULT 'alumno' CHECK (role IN ('profesor', 'alumno')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Tabla de cursos (creados por profesores)
-CREATE TABLE IF NOT EXISTS courses (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-<<<<<<< Updated upstream
-  teacher_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  code VARCHAR(50) UNIQUE NOT NULL, -- Código para que alumnos se unan
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- 3. Tabla de temarios dentro de cursos
+-- 2. Tabla de temas/cursos
 CREATE TABLE IF NOT EXISTS topics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
-  content TEXT NOT NULL,
-  activities TEXT, -- JSON con actividades
+  course_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  order_index INT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. Tabla de inscripciones de alumnos a cursos
+-- 3. Tabla de cursos (creados por profesores)
+CREATE TABLE IF NOT EXISTS courses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  teacher_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Tabla de inscripciones a cursos
 CREATE TABLE IF NOT EXISTS course_enrollments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   course_id UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-  progress DECIMAL(5, 2) DEFAULT 0, -- Porcentaje de avance
-=======
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE,
   context_data JSONB DEFAULT '[]',
   progress_data JSONB DEFAULT '{}',
->>>>>>> Stashed changes
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(student_id, course_id)
@@ -55,6 +48,11 @@ CREATE TABLE IF NOT EXISTS course_enrollments (
 CREATE TABLE IF NOT EXISTS chat_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  topic_id UUID NOT NULL REFERENCES topics(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 6. Tabla de configuración de persona pedagógica (estilo del docente)
 CREATE TABLE IF NOT EXISTS persona_configs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -106,8 +104,3 @@ CREATE INDEX IF NOT EXISTS idx_student_syllabus_student_id ON student_syllabus(s
 CREATE INDEX IF NOT EXISTS idx_student_syllabus_course_id ON student_syllabus(course_id);
 CREATE INDEX IF NOT EXISTS idx_topic_summaries_student_id ON topic_summaries(student_id);
 CREATE INDEX IF NOT EXISTS idx_topic_summaries_topic_id ON topic_summaries(topic_id);
-
-ent_id);
-CREATE INDEX IF NOT EXISTS idx_enrollments_course_id ON course_enrollments(course_id);
-CREATE INDEX IF NOT EXISTS idx_chat_sessions_student_id ON chat_sessions(student_id);
-CREATE INDEX IF NOT EXISTS idx_chat_sessions_topic_id ON chat_sessions(topic_id);

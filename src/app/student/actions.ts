@@ -2,7 +2,7 @@
 "use server";
 
 import { supabaseAdmin } from '@/lib/supabase';
-import { getUserIdFromToken } from '@/lib/auth';
+import { getUserId } from '@/lib/auth';
 
 // ============ INSCRIPCIONES A CURSOS ============
 
@@ -13,7 +13,7 @@ export async function enrollInCourse(courseCode: string) {
   }
 
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado' };
     }
@@ -97,7 +97,7 @@ export async function enrollInCourse(courseCode: string) {
 // Obtener cursos inscritos del estudiante
 export async function getStudentCourses() {
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado', courses: [] };
     }
@@ -145,7 +145,7 @@ export async function getStudentCourses() {
 // Obtener detalles de un curso inscrito (con temarios)
 export async function getStudentCourseDetails(courseId: string) {
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado' };
     }
@@ -247,7 +247,7 @@ export async function getStudentCourseDetails(courseId: string) {
 // Abandonar un curso
 export async function dropCourse(courseId: string) {
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado' };
     }
@@ -274,7 +274,7 @@ export async function dropCourse(courseId: string) {
 // Obtener detalles de un temario con historial de chat
 export async function getTopicDetails(courseId: string, topicId: string) {
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado' };
     }
@@ -369,7 +369,7 @@ export async function saveChatMessage(
   content: string
 ) {
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado' };
     }
@@ -436,7 +436,7 @@ export async function updateTopicStatus(
   status: 'pending' | 'in_progress' | 'completed'
 ) {
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado' };
     }
@@ -484,7 +484,7 @@ export async function updateTopicStatus(
 // Actualizar progreso del estudiante (deprecated - usar updateTopicStatus)
 export async function updateStudentProgress(courseId: string, progress: number) {
   try {
-    const studentId = await getUserIdFromToken();
+    const studentId = await getUserId();
     if (!studentId) {
       return { error: 'No estás autenticado' };
     }

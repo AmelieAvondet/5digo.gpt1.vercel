@@ -2,7 +2,7 @@
 "use server";
 
 import { supabaseAdmin } from '@/lib/supabase';
-import { getUserIdFromToken } from '@/lib/auth';
+import { getUserId } from '@/lib/auth';
 
 // ============ CURSOS ============
 
@@ -17,7 +17,7 @@ export async function createCourse(formData: FormData) {
   }
 
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }
@@ -43,7 +43,7 @@ export async function createCourse(formData: FormData) {
 // Obtener todos los cursos del profesor
 export async function getTeacherCourses() {
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }
@@ -66,7 +66,7 @@ export async function getTeacherCourses() {
 // Obtener detalles de un curso
 export async function getCourseDetails(courseId: string) {
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }
@@ -122,7 +122,7 @@ export async function updateCourse(courseId: string, formData: FormData) {
   }
 
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }
@@ -145,7 +145,7 @@ export async function updateCourse(courseId: string, formData: FormData) {
 // Eliminar curso
 export async function deleteCourse(courseId: string) {
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }
@@ -257,7 +257,7 @@ export async function deleteTopic(topicId: string) {
 
 export async function importCourseFromJSON(courseData: any) {
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }
@@ -376,7 +376,7 @@ export async function initializeSyllabusForStudent(
  */
 export async function initializeSyllabusForAllStudents(courseId: string) {
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }
@@ -471,7 +471,7 @@ export async function setPersonaForCourse(
   }
 ) {
   try {
-    const teacherId = await getUserIdFromToken();
+    const teacherId = await getUserId();
     if (!teacherId) {
       return { error: 'No estás autenticado' };
     }

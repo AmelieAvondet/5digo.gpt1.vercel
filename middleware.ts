@@ -1,46 +1,51 @@
 // Archivo: middleware.ts
+// Middleware para proteger rutas con Supabase Auth
 
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-secret-key-min-32-chars-long!!!'
-);
 
 // Rutas que requieren autenticación
-const protectedRoutes = ['/chat', '/admin'];
+const protectedRoutes = ['/chat', '/admin', '/student', '/courses'];
+const publicRoutes = ['/login', '/register', '/'];
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Verificar si la ruta requiere autenticación
+  // Permitir rutas públicas
+  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route));
+  
+  // Verificar si es una ruta protegida
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
-  if (!isProtectedRoute) {
+  // Si es ruta pública, dejar pasar
+  if (isPublicRoute && !isProtectedRoute) {
     return NextResponse.next();
   }
 
-  // Obtener el token de las cookies
-  const token = request.cookies.get('auth_token')?.value;
+  // Obtener la cookie de sesión de Supabase
+  const authToken = request.cookies.get('sb-access-token')?.value;
 
-  if (!token) {
-    console.log(`[MIDDLEWARE] Acceso denegado a ${pathname}: sin token`);
+  if (!authToken && isProtectedRoute) {
+    console.log(`[MIDDLEWARE] Acceso denegado a ${pathname}: sin sesión`);
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  try {
-    // Verificar y decodificar el token
-    const verified = await jwtVerify(token, JWT_SECRET);
-    console.log(`[MIDDLEWARE] Token verificado para usuario: ${(verified.payload as any).userId}`);
-    
-    // Token válido, permitir acceso
-    return NextResponse.next();
-  } catch (error) {
-    console.log(`[MIDDLEWARE] Token inválido o expirado para ${pathname}`);
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Si hay usuario en ruta auth, redirigir
+  if (authToken && (pathname === '/login' || pathname === '/register')) {
+    return NextResponse.redirect(new URL('/courses', request.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/chat/:path*', '/admin/:path*'],
+  matcher: [
+    /*
+     * Coincidir todas las rutas de solicitud excepto las siguientes:
+     * - _next/static (archivos estáticos)
+     * - _next/image (archivos de optimización de imágenes)
+     * - favicon.ico (archivo de favicon)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+  ],
 };

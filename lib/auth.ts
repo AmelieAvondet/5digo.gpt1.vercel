@@ -1,103 +1,77 @@
 // Archivo: lib/auth.ts
-// Utilidades centralizadas de autenticación
+// Utilidades de autenticación con Supabase Auth
 
 import { cookies } from 'next/headers';
-import { jwtVerify, SignJWT } from 'jose';
-
-// Validación estricta de JWT_SECRET
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
-}
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+import { createServerClient } from './supabase';
 
 /**
- * Interfaz del payload del JWT
- * Extiende el JWTPayload de jose para compatibilidad
+ * Interfaz del usuario autenticado
  */
-export interface JWTPayload {
-  userId: string;
+export interface AuthUser {
+  id: string;
   email: string;
   role: 'profesor' | 'alumno';
-  [key: string]: unknown; // Index signature requerida por jose
 }
 
 /**
- * Crea un JWT con los datos del usuario
+ * Obtiene el usuario actual desde la sesión de Supabase
  */
-export async function createJWT(payload: JWTPayload): Promise<string> {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('7d')
-    .sign(JWT_SECRET);
-}
-
-/**
- * Verifica y decodifica un JWT
- */
-export async function verifyJWT(token: string): Promise<JWTPayload | null> {
+export async function getCurrentUser(): Promise<AuthUser | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as unknown as JWTPayload;
+    const supabase = await createServerClient();
+    
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      console.log('[AUTH] No user session found');
+      return null;
+    }
+
+    // Obtener rol adicional desde tabla users
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('id, email, role')
+      .eq('id', user.id)
+      .single();
+
+    if (userError || !userData) {
+      console.log('[AUTH] User data not found in database');
+      return null;
+    }
+
+    return {
+      id: userData.id,
+      email: userData.email,
+      role: userData.role,
+    };
   } catch (error) {
-    console.error('[AUTH] JWT verification failed:', error);
+    console.error('[AUTH] Error getting current user:', error);
     return null;
   }
 }
 
 /**
- * Obtiene el userId desde el token JWT en las cookies
- * @returns userId o null si no hay token válido
+ * Obtiene el ID del usuario actual
  */
-export async function getUserIdFromToken(): Promise<string | null> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
-
-    if (!token) {
-      console.log('[AUTH] No token found in cookies');
-      return null;
-    }
-
-    const payload = await verifyJWT(token);
-    if (!payload) {
-      console.log('[AUTH] Invalid token');
-      return null;
-    }
-
-    return payload.userId;
-  } catch (error) {
-    console.error('[AUTH] Error getting userId from token:', error);
-    return null;
-  }
+export async function getUserId(): Promise<string | null> {
+  const user = await getCurrentUser();
+  return user?.id || null;
 }
 
 /**
- * Obtiene el payload completo del JWT desde las cookies
+ * Clearea la sesión de autenticación
  */
-export async function getUserFromToken(): Promise<JWTPayload | null> {
+export async function clearAuthSession(): Promise<void> {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
-
-    if (!token) {
-      return null;
-    }
-
-    return await verifyJWT(token);
+    const supabase = await createServerClient();
+    await supabase.auth.signOut();
   } catch (error) {
-    console.error('[AUTH] Error getting user from token:', error);
-    return null;
+    console.error('[AUTH] Error clearing session:', error);
   }
 }
-
-/**
- * Establece el token de autenticación en las cookies
- */
-export async function setAuthCookie(token: string): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.set('auth_token', token, {
-    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24 * 7, // 7 días
     path: '/',

@@ -3,11 +3,11 @@
 "use server";
 
 import { supabaseAdmin } from '@/lib/supabase';
-import { getUserIdFromToken } from '@/lib/auth';
+import { getUserId } from '@/lib/auth';
 
 export async function loadAvailableTopics() {
   try {
-    const userId = await getUserIdFromToken();
+    const userId = await getUserId();
     if (!userId) {
       return { error: "No estás autenticado.", topics: [] };
     }
