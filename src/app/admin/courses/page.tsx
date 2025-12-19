@@ -56,18 +56,18 @@ export default function CoursesPage() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div> 
+            <div>
               <div>
-              <h1 className="text-xl font-bold text-gray-900">Tutor IA</h1>
-            </div>
+                <h1 className="text-xl font-bold text-gray-900">Tutor IA</h1>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
               <Link
-                href="/admin/courses/new"
+                href="/admin/import-course"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium"
               >
-                + Crear Curso
+                Importar Curso
               </Link>
 
               <div className="relative">
@@ -98,24 +98,6 @@ export default function CoursesPage() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Sección de Importar Curso */}
-        <div className="bg-gray-100 rounded-lg p-6 mb-8">
-          <div className="flex items-start gap-3 mb-4">
-            <span className="text-2xl">📥</span>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">Importar Curso</h2>
-              <p className="text-gray-600 text-sm mt-1">
-                Importa un curso completo desde un archivo JSON con estructura de módulos y subtemas
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/admin/import-course"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium"
-          >
-            📄 Importar desde JSON
-          </Link>
-        </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-700">
@@ -125,18 +107,16 @@ export default function CoursesPage() {
 
         {courses.length === 0 ? (
           <div className="bg-white rounded-xl border-2 border-dashed border-gray-200 p-12 text-center">
-            <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17s4.5 10.747 10 10.747c5.5 0 10-4.998 10-10.747S17.5 6.253 12 6.253z" />
-            </svg>
-            <p className="text-gray-600 font-medium mb-2">No tienes cursos aún</p>
-            <p className="text-gray-500 text-sm mb-4">
-              Crea tu primer curso para empezar a enseñar
+            <span className="text-4xl mb-4 block">📥</span>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">No tienes cursos configurados</h3>
+            <p className="text-gray-500 mb-6">
+              Importa un archivo JSON con la estructura de módulos y subtemas para comenzar.
             </p>
             <Link
-              href="/admin/courses/new"
-              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
+              href="/admin/import-course"
+              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium"
             >
-              Crear tu primer curso
+              Importar desde JSON
             </Link>
           </div>
         ) : (
