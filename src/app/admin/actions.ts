@@ -98,7 +98,7 @@ export async function getCourseDetails(courseId: string) {
     if (enrollmentsError) throw enrollmentsError;
 
     // Obtener información de usuarios manualmente
-    let enrollments = [];
+    let enrollments: any[] = [];
     if (rawEnrollments && rawEnrollments.length > 0) {
       const studentIds = rawEnrollments.map(e => e.student_id);
 
